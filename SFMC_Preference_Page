@@ -1,5 +1,5 @@
 %%[
-//set @subscriberKey = RequestParameter('Subkey')
+
 
 set @rr = CreateObject('RetrieveRequest')
 //retrieveObject is used to retrieve data from the system
@@ -39,15 +39,8 @@ Set @lists = InvokeRetrieve(@rr)
 
 //display the result using for loop
 
-for @count =1 to RowCount(@lists) do
-set @list = Row(@lists,@count)
-set @id_int = field(@list,"ID",0)
-set @id = concat(field(@list,"ID",0),"")
-set @listName = field(@list,"ListName",0)
-set @listClassification = field(@list,"ListClassification",0)
-set @listType = field(@list,"Type",0)
 
-Output(@listName)
+Output(@lists)
 
-next @count
+
 ]%%
