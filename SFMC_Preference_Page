@@ -1,5 +1,7 @@
 %%[
 
+Set @subscriberkey = RequestParameter("subkey")
+
 SET @rr = CreateObject("RetrieveRequest")  
 
 SetObjectProperty(@rr, "ObjectType","List")  /* creating object to retrieve list with paramters */
@@ -42,3 +44,5 @@ For @count = 1 to rowcount(@Lists) do  /* For loop syntax */
 <br>
 
  %%[next @count]%%
+
+SubscriberKey = %%=v(@subscriberkey)=%%
