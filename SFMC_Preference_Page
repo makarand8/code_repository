@@ -1,1 +1,38 @@
-Hi
+%%[
+set @subscriberKey = RequestParameter('Subkey')
+
+set @rr = CreateObject('RetrieveRequest')
+//retrieveObject is used to retrieve data from the system
+
+setObjectProperty(@rr,'ObjectType','List') //Specifying that the object is list
+
+//setting properties for the list object
+AddObjectArrayItem(@rr,'Properties','ID')
+AddObjectArrayItem(@rr,'Properties','ListName')
+AddObjectArrayItem(@rr,'Properties','ListClassification')
+AddObjectArrayItem(@rr,'Properties','Type')
+
+//creating filter one to filter publication list from the mc
+set @sf1 = CreateObject('SimpleFilter')
+SetObjectProperty(@sf1,'Property','ListClassification')
+SetObjectProperty(@sf1,'SimpleOperator','equals')
+AddObjectArrayItem(@sf1,'Value','PublicationList')
+
+//Creating filter two to filter public list from the mc
+set @sf2 = CreateObject('SimpleFilterPart')
+SetObjectProperty(@sf2,'Property','Type')
+SetObjectProperty(@sf2, 'SimpleOperator','equals')
+AddObjectArrayItem(@sf2,'value','Public')
+
+//Creating complex filter using complexfilterpart, where you can join two simplefilterparts with AND or OR
+set @cf = CreateObject('ComplexFilterPart')
+setObjectProperty(@cf,'LeftOperand',@sf1)
+setObjectProperty(@cf,'LogicalOperator','AND')
+setObjectProperty(@cf,'RightOperand',@sf2)
+
+//Applying the created complex filter to the retrieve request object
+setObjectProperty(@rr,'Filter',@cf)
+
+
+
+]%%
