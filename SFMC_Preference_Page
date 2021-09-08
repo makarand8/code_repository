@@ -13,7 +13,7 @@ AddObjectArrayItem(@rr,'Properties','ListClassification')
 AddObjectArrayItem(@rr,'Properties','Type')
 
 //creating filter one to filter publication list from the mc
-set @sf1 = CreateObject('SimpleFilter')
+set @sf1 = CreateObject('SimpleFilterPart')
 SetObjectProperty(@sf1,'Property','ListClassification')
 SetObjectProperty(@sf1,'SimpleOperator','equals')
 AddObjectArrayItem(@sf1,'Value','PublicationList')
