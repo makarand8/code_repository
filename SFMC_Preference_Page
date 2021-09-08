@@ -40,7 +40,4 @@ Set @lists = InvokeRetrieve(@rr)
 //display the result using for loop
 
 
-Output(@lists)
-
-
 ]%%
