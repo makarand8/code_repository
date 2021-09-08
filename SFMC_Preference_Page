@@ -33,6 +33,21 @@ setObjectProperty(@cf,'RightOperand',@sf2)
 //Applying the created complex filter to the retrieve request object
 setObjectProperty(@rr,'Filter',@cf)
 
+//invoke the retrieve request object and store it in a variable
 
+Set @lists = InvokeRetrieve(@rr)
 
+//display the result using for loop
+
+for @count =1 to RowCount(@lists) do
+set @list = Row(@lists,@count)
+set @id_int = field(@list,"ID",0)
+set @id = concat(field(@list,"ID",0),"")
+set @listName = field(@list,"ListName",0)
+set @listClassification = field(@list,"ListClassification",0)
+set @listType = field(@list,"Type",0)
+
+Output(@listName)
+
+next @count
 ]%%
