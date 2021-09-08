@@ -1,5 +1,5 @@
 %%[
-set @subscriberKey = RequestParameter('Subkey')
+//set @subscriberKey = RequestParameter('Subkey')
 
 set @rr = CreateObject('RetrieveRequest')
 //retrieveObject is used to retrieve data from the system
