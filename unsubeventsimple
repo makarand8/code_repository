@@ -1,0 +1,20 @@
+<script runat="server">
+  
+Platform.Load('Core','1');
+var debugging = true;
+  
+function debugValue(description, value) {
+        Write(description + ': ' + (typeof value == 'object' ? Stringify(value) : value) + '<br><br>');
+    };
+
+try {
+
+var sub = Subscriber.Init('001');
+var status = sub.Unsubscribe();
+Write(status);
+
+    } catch (error) {
+        if (debugging) debugValue('1. Error caught', error);
+    };
+  
+</script>
