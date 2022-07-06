@@ -1,0 +1,27 @@
+ %%[
+    SET @subscriberkey = _subscriberkey
+    SET @email = AttributeValue('Email')
+
+
+    IF Substring(@subscriberkey, 1, 3) = '00Q' THEN
+    SET @subscribertype = 'Lead'   
+    ELSEIF Substring(@subscriberkey, 1, 3) = '003' THEN
+    SET @subscribertype = 'Contact'
+    ElSE 
+    SET @subscribertype = 'Other' 
+    ENDIF
+    
+    InsertDE('DoubleOptIN', 'SubscriberKey', @SubscriberKey,'SubscriberType',@subscribertype, 'Email',@Email,'DoubleOptInStatus','N')
+
+    CloudPagesURL(1122, 'SubscriberKey', @subscriberkey,'Email',@email,'SubscriberType',@subscribertype)
+
+    SET @subscriberkey =  RequestParameter('SubscriberKey')
+    SET @email =  RequestParameter('Email')
+    SET @subscribertype = RequestParameter('SubscriberType')
+
+    UpdateData('DoubleOptIn',1, 'SubscriberKey', @subscriberkey,'DoubleOptInStatus','Y',"DoubleOptInDate",Now())
+
+    UpdateSingleSalesforceObject(@subscribertype, @subscriberkey, DoubleOptInStatus__c, 'Y')
+]%%
+
+
