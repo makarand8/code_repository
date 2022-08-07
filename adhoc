@@ -1,0 +1,223 @@
+%%[
+
+    VAR @subscriberkey, @email, @subscribertype, @rows, @noofrows
+    SET @subscriberkey = _subscriberkey
+    SET @email = AttributeValue('Email')
+
+
+    IF Substring(@subscriberkey, 1, 3) = '00Q' THEN
+    SET @subscribertype = 'Lead'   
+    ELSEIF Substring(@subscriberkey, 1, 3) = '003' THEN
+    SET @subscribertype = 'Contact'
+    ElSE 
+    SET @subscribertype = 'Other' 
+    ENDIF
+    
+    SET @rows = LookupRows('Double Opt-In Status', 'SubscriberKey', @subscriberkey)
+    SET @noofrows = RowCount(@rows)
+
+    IF @noofrows > 1 THEN
+
+    RaiseError(STRING, BOOLEAN, STRING, STRING, BOOLEAN)
+
+    ElSE
+
+    InsertDE('Double Opt-In Status', 'SubscriberKey', @subscriberkey,'Email',@email,'SubscriberType',@subscribertype, 'DoubleOptInStatus','N')
+        
+    ENDIF
+    
+ VAR @subscriberkey, @email, @subscribertype, @doubleOptInDate
+
+ SET @subscriberkey =  RequestParameter('SubscriberKey')
+ SET @email =  RequestParameter('Email')
+ SET @subscribertype = RequestParameter('SubscriberType')
+
+ SET @doubleOptInDate = SystemDateToLocalDate(Now())
+ 
+ UpdateData('Double Opt-In Status',1, 'SubscriberKey', @subscriberkey,'DoubleOptInStatus','Y','DoubleOptInDate',@DoubleOptInDate)
+ 
+
+UpdateSingleSalesforceObject(@subscribertype, @subscriberkey, "DoubleOptInStatus__c", 'Y',"DoubleOptInTimestamp__c",@DoubleOptInDate)
+
+
+
+
+
+
+
+]%%
+
+
+%%=CloudPagesURL(84, 'SubscriberKey', @subscriberkey,'Email',@email,'SubscriberType',@subscribertype)=%%
+%%=CloudPagesURL(81)=%%
+
+
+<script runat="server">
+Platform.Load("Core", "1")    
+var prox = new Script.Util.WSProxy();
+
+
+
+var tsExKey = '7898'; 
+var EmailAddress =  Variable.GetValue("@email");
+var SubscriberKey = Variable.GetValue("@subscriberKey"); 
+var firstname = Variable.GetValue("@firstname");
+var tsDef = {
+    TriggeredSendDefinition: {
+        CustomerKey: tsExKey
+    },
+    Subscribers: [{
+        EmailAddress: EmailAddress,
+        SubscriberKey: SubscriberKey,
+        FirstName: firstname
+    }]
+};
+var res = prox.createItem('TriggeredSend', tsDef);  
+Write(Stringify(res));
+</script>
+
+
+
+
+
+/* Lead */
+
+/* DOIFirstEmailSendDate__c
+DoubleOptInStatus__c
+DoubleOptInTimestamp__c */
+
+/* Contact  */
+
+/* DOIFirstEmailSendDate__c
+DoubleOptInStatus__c
+DoubleOptInTimestamp__c */
+
+SET @doubleOptInDate = SystemDateToLocalDate(Now())
+  
+SET @updateSFRec = UpdateSingleSalesforceObject('Lead','00Q7Q000005fC2yUAE', 'DoubleOptInStatus__c', 'Y','DoubleOptInTimestamp__c',@DoubleOptInDate)
+
+
+%%[
+VAR @ts, @tsDef, @ts_extkey, @ts_email, @ts_sub, @ts_statusCode, @ts_statusMsg, @errorCode
+SET @ts = CreateObject("TriggeredSend")
+SET @tsDef = CreateObject("TriggeredSendDefinition")
+SET @ts_extkey = "7898"
+SET @ts_email = "salesforcemcmg99@gmail.com"
+SET @ts_subkey = "00Q7Q000005fC2yUAE"
+
+SetObjectProperty(@tsDef, "CustomerKey", @ts_extkey)
+SetObjectProperty(@ts, "TriggeredSendDefinition", @tsDef)
+ 
+SET @ts_sub = CreateObject("Subscriber")
+SetObjectProperty(@ts_sub, "EmailAddress", @ts_email)
+SetObjectProperty(@ts_sub, "SubscriberKey", @ts_subkey)
+AddObjectArrayItem(@ts, "Subscribers", @ts_sub)
+
+SET @ts_statusCode = InvokeCreate(@ts, @ts_statusMsg, @errorCode)
+IF @ts_statusCode != "OK" THEN
+RaiseError(@ts_statusMsg, 0, @ts_statusCode, @errorCode)
+ENDIF
+]%%
+
+
+
+
+ %%[
+  
+ VAR @subscriberkey, @email, @subscribertype, @doubleOptInDate
+ VAR @ts, @tsDef, @ts_extkey, @ts_email, @ts_sub, @ts_statusCode, @ts_statusMsg, @errorCode
+
+ SET @subscriberkey =  '00Q7Q000005fC2yUAE'
+ SET @email =  'salesforcemcmg99@gmail.com'
+ SET @firstname = 'Salesforce MCMG'
+
+
+
+SET @ts = CreateObject("TriggeredSend")
+SET @tsDef = CreateObject("TriggeredSendDefinition")
+SET @ts_extkey = "7898"
+
+
+SetObjectProperty(@tsDef, "CustomerKey", @ts_extkey)
+SetObjectProperty(@ts, "TriggeredSendDefinition", @tsDef)
+ 
+SET @ts_sub = CreateObject("Subscriber")
+SetObjectProperty(@ts_sub, "EmailAddress", @email)
+SetObjectProperty(@ts_sub, "SubscriberKey", @subscriberkey)
+AddObjectArrayItem(@ts, "Subscribers", @ts_sub)
+
+SET @ts_statusCode = InvokeCreate(@ts, @ts_statusMsg, @errorCode)
+IF @ts_statusCode != "OK" THEN
+RaiseError(@ts_statusMsg, 0, @ts_statusCode, @errorCode)
+ENDIF
+
+  ]%%
+  
+
+
+
+SELECT
+Emailaddress, 
+Subscriberkey
+FROM _subscribers
+WHERE Status = 'unsubscribed'
+
+
+SELECT s.SubscriberKey
+FROM [_Subscribers] s
+INNER JOIN [myUnsubDE] m
+ON m.EmailAddress = s.EmailAddress
+WHERE m.EmailAddress IS NOT NUL
+
+
+<script runat="server">
+Platform.Load("core","1");
+
+var OrdersDE = DataExtension.Init("Orders");
+var rows = OrdersDE.Rows.Lookup(["CustomerId"], [custId]);
+if(rows.length >= 1) {
+for (i = 0; i < rows.length; i++) {
+OrderItem = rows[i]["OrderItem"];
+Write("&#8226; OrderItem " + i + ":" + OrderItem + "<br>");
+}
+}
+</script>
+
+var subObj = Subscriber.Init("SubKey");
+var status = subObj.Unsubscribe();
+
+<div style="display:none"> 
+ 
+%%[
+
+    VAR @subscriberkey, @email, @subscribertype, @rows, @noofrows
+    
+    SET @subscriberkey = _subscriberkey
+    SET @email = AttributeValue('Email')
+
+
+    IF Substring(@subscriberkey, 1, 3) == '00Q' THEN
+    SET @subscribertype = 'Lead'   
+    ELSEIF Substring(@subscriberkey, 1, 3) == '003' THEN
+    SET @subscribertype = 'Contact'
+    ElSE 
+    SET @subscribertype = 'Other' 
+    ENDIF
+    
+    
+    SET @rows = LookupRows('Double Opt-In Status', 'SubscriberKey', @subscriberkey)
+    SET @noofrows = RowCount(@rows)
+
+    IF @noofrows > 0 THEN
+
+    RaiseError('Subscriber already exists.', TRUE)
+
+    ElSE
+
+    InsertDE('Double Opt-In Status', 'SubscriberKey', @subscriberkey,'Email',@email,'SubscriberType',@subscribertype, 'DoubleOptInStatus','N')
+        
+    ENDIF
+
+]%%
+
+</div>
